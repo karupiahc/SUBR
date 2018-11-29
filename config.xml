@@ -105,7 +105,7 @@
         <!--<gap:plugin name="com.parse.cordova.core.pushplugin" version="0.1.0" />-->
         
         <gap:plugin name="phonegap-plugin-push" source="npm">
-            <param name="SENDER_ID" value="402041666872" />
+            <param name="SENDER_ID" value="459115189650" />
         </gap:plugin>
         <gap:plugin name="cordova-plugin-camera" source="npm" />
         <gap:plugin name="cordova-plugin-actionsheet" source="npm" />
