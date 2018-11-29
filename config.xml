@@ -109,7 +109,8 @@
         </gap:plugin>
         <gap:plugin name="cordova-plugin-camera" source="npm" />
         <gap:plugin name="cordova-plugin-actionsheet" source="npm" />
-        <gap:plugin name="nl.x-services.plugins.socialsharing" source="npm" />
+        <!--<gap:plugin name="nl.x-services.plugins.socialsharing" source="npm" />-->
+        <gap:plugin name="cordova-plugin-x-socialsharing" source="npm" spec="5.4.1"/>
         <plugin spec="https://github.com/venkykowshik/startapp.git" source="git" />
         <gap:config-file platform="ios" parent="LSApplicationQueriesSchemes" overwrite="true">
             <array>
