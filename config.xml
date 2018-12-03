@@ -6,7 +6,6 @@
         <description>Southern University and A&amp;M College | Baton Rouge</description>
         <author href="http://kryptosmobile.com" email="info@kryptosmobile.com">Kryptos Mobile Team</author>
         <feature name="http://api.phonegap.com/1.0/device" />
-        
         <!--<preference name="phonegap-version" value="cli-5.2.0" />-->
         
                 <preference name="permissions"                value="none"/>
