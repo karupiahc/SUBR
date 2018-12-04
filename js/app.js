@@ -77,7 +77,7 @@ document.addEventListener('deviceready',onDeviceReady, false);
 
 var MyCampusApp = {
     config : {
-        tenant : "SUBR",
+        tenant : "ENMUR",
         serverUrl : "https://kryptos.kryptosmobile.com",
         tenantFolder : function(device, tenant) {
             if(device.platform == 'Android') {
@@ -140,9 +140,11 @@ var MyCampusApp = {
         var storedMetadata =  $.jStorage.get( tenant + '-metadata'); //window.localStorage.getItem('metadata');
         //If Metadata doesn't exist in the local storage. Then this app is launched for the first time.
         //Lets pull the default metadata file.
+        //var pushconfig;
         if(!storedMetadata) {
             $http.get("default-metadata.json").success(function(data){
                 var tenantid = data.tenantid
+                //alert(JSON.stringify(data));
                 $.jStorage.set(tenantid + '-metadata', data);
                 MyCampusApp.config.tenant = tenantid;
                 $rootScope.tenant = tenantid;
@@ -150,13 +152,10 @@ var MyCampusApp = {
                 storedMetadata = data;
 
                 if(window.device && data.pushconfig) {
-                    MyCampusApp.activatePushNotification(tenantid,$http);
-                }
-                //var message = '<style>.blockOverlay{opacity:1 !important;}</style><div style="margin:auto;position:fixed;left:0px;right:0px;vertical-align: middle; display: inline-block;"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
-                                                       
-                                                       
-                var message = '<style>.blockOverlay{opacity:1 !important;}</style><div id="floatingBarsG"><div class="blockG" id="rotateG_01"></div><div class="blockG" id="rotateG_02"></div><div class="blockG" id="rotateG_03"></div><div class="blockG" id="rotateG_04"></div><div class="blockG" id="rotateG_05"></div><div class="blockG" id="rotateG_06"></div><div class="blockG" id="rotateG_07"></div><div class="blockG" id="rotateG_08"></div></div><div><h3 style="color:white;">Initializing..</h3></div>';
-                                                       
+                                                                MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
+                                                            }
+               // var message = '<div style="margin: 2px; vertical-align: middle; display: inline-block"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
+                var message = '<style>.blockOverlay{opacity:1 !important;}</style><div style="margin:auto;position:fixed;left:0px;right:0px;vertical-align: middle; display: inline-block;"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
                 $.blockUI({message : message});
                 setTimeout(function() {
                     $.unblockUI();
@@ -172,9 +171,13 @@ var MyCampusApp = {
         
         //Store update bug fix start (Nick)
         else {
-			if(!$rootScope.imageoptimized) {
-				$http.get("default-metadata.json").success(function(data){
+            if(!$rootScope.imageoptimized) {
+                $http.get("default-metadata.json").success(function(data){
                                                            $rootScope.imageoptimized = true;
+                                                           //alert(JSON.stringify(data));
+                                                           if(window.device && data.pushconfig) {
+                                                                MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
+                                                            }
                                                            if(data.version >= storedMetadata.version) {
                                                            var tenantid = data.tenantid
                                                            $.jStorage.set(tenantid + '-metadata', data);
@@ -184,6 +187,9 @@ var MyCampusApp = {
                                                            storedMetadata = data;
                                                            $rootScope.brandingUrl = storedMetadata.brandingurl + "?q=" + Math.random();
                                                            $rootScope.backgroundUrl = storedMetadata.backgroundurl + "?q=" + Math.random();
+
+                                                           
+
                                                            //var message = '<div style="margin: auto; vertical-align: middle; display: inline-block;position:fixed;left:0px;right:0px;"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Starting up</h3></div>';
                                                            //$.blockUI({message : message});
                                                            $.blockUI();
@@ -194,8 +200,8 @@ var MyCampusApp = {
                                                            }
                                                            }).error(function(data){
                                                                     });
-			}
-		}
+            }
+        }
 
         setTimeout(function() {
             try {
@@ -205,6 +211,8 @@ var MyCampusApp = {
             }
         }, 0);
 
+        
+        
         //Store update bug fix end (Nick)
         
         if(storedMetadata) {
@@ -260,13 +268,6 @@ var MyCampusApp = {
             $rootScope.metadata = storedMetadata;
             $rootScope.middlewareServerUrl = storedMetadata.middlewareServerUrl;
             $rootScope.customStyle = $sce.trustAs($sce.CSS, storedMetadata.customStyle);
-            
-            /*Nick added to get device details - start*/
-            $rootScope.devicePlatform = window.device.platform;
-            $rootScope.deviceUUID = window.device.uuid;
-            $rootScope.deviceModel = window.device.model;
-            $rootScope.deviceVersion = window.device.version;
-            /*Nick added to get device details - end*/
 
             $('#customstyle').html(storedMetadata.customStyle);
             try {
@@ -423,9 +424,9 @@ var MyCampusApp = {
     resumeHandler: function(){
         try {
             $.unblockUI();
-			if(MyCampusApp.rootScope) {
-				MyCampusApp.rootScope.updateCheck();
-			}
+            if(MyCampusApp.rootScope) {
+                MyCampusApp.rootScope.updateCheck();
+            }
         }catch(e) {
             //alert("Exception in Resume handler : " + e);
         }
@@ -486,27 +487,27 @@ var MyCampusApp = {
                         $rootScope.umalert = false;
                     };
                     if(!silent) {
-						if(window.device) {
-							if(!$rootScope.umalert) {
-								$rootScope.umalert = true;
-								navigator.notification.confirm(
-									'App Updates available. Update?', // message
-									onConfirm,            // callback to invoke with index of button pressed
-									'Update Manager',           // title
-									['Yes','No']         // buttonLabels
-								);
-							}
-						}else {
-							apprise("App Updates available. Update? ", {'verify':true, 'textYes':"Yes", 'textNo':"No"}, function(r) {
-								if(r) {
-									//navigator.app.exitApp();
-									MyCampusApp.updateMetadata(tenant, url, $http, data, $route, $rootScope, $scope, $sce, logosDirPath, $compile);
-								} else MyCampusApp.modalDialogDisplayed = false;
-							});
-						}
-					}else {
-						onConfirm(1);
-					}
+                        if(window.device) {
+                            if(!$rootScope.umalert) {
+                                $rootScope.umalert = true;
+                                navigator.notification.confirm(
+                                    'App Updates available. Update?', // message
+                                    onConfirm,            // callback to invoke with index of button pressed
+                                    'Update Manager',           // title
+                                    ['Yes','No']         // buttonLabels
+                                );
+                            }
+                        }else {
+                            apprise("App Updates available. Update? ", {'verify':true, 'textYes':"Yes", 'textNo':"No"}, function(r) {
+                                if(r) {
+                                    //navigator.app.exitApp();
+                                    MyCampusApp.updateMetadata(tenant, url, $http, data, $route, $rootScope, $scope, $sce, logosDirPath, $compile);
+                                } else MyCampusApp.modalDialogDisplayed = false;
+                            });
+                        }
+                    }else {
+                        onConfirm(1);
+                    }
                 }
             });
     },
@@ -516,7 +517,7 @@ var MyCampusApp = {
         $http.post(url + "/metagate/metadata/" + tenant + "?callback=JSON_CALLBACK", {source: data.source, id : data.id, device: window.device}).
             success(function(data) {
                 if(window.device && data.pushconfig) {
-                    MyCampusApp.activatePushNotification(tenant,$http);
+                    MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                 }
                 MyCampusApp.refreshMetdata(data, $rootScope, $scope, $sce, tenant, url, logosDirPath, $route, $compile);
                 //$.jStorage.set(tenant + '-metadata', data);
@@ -783,7 +784,7 @@ var MyCampusApp = {
                 });
                 (function loop(){
                     setTimeout(function() {
-						//alert ("Inside loop.." + downcounter);
+                        //alert ("Inside loop.." + downcounter);
                         if(downcounter == 0) {
                             //$route.reload();
                             //$rootScope.broadcast("");
@@ -794,9 +795,9 @@ var MyCampusApp = {
                             setTimeout(function() {
                                 $.unblockUI();
                             },2000);
-						}catch(exce) {
-							//alert ("Exception .." + exce);
-						}
+                        }catch(exce) {
+                            //alert ("Exception .." + exce);
+                        }
 
                         } else {
                             loop();
@@ -894,11 +895,12 @@ var MyCampusApp = {
             });
     },
 
-    activatePushNotification : function(tenantId,$http) {
+    activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
+            //alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
-            if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
-                MyCampusApp.rootScope.push = PushNotification.init({
+
+            MyCampusApp.rootScope.push = PushNotification.init({
                                                                    android: {
                                                                    senderID: pushconfig.senderID
                                                                    },
@@ -912,8 +914,12 @@ var MyCampusApp = {
                                                                    },
                                                                    windows: {}
                                                                    });
+            
+            
                 
-                MyCampusApp.rootScope.push.on('registration', function(data) {
+            if(!MyCampusApp.rootScope.onNotification){
+            //alert("onnotification");    
+            MyCampusApp.rootScope.push.on('registration', function(data) {
                                               var devicePushID = data.registrationId;
                                               var pushDeviceData = {
                                               "tenant": MyCampusApp.rootScope.tenant,
@@ -921,6 +927,7 @@ var MyCampusApp = {
                                               "type": device.platform,
                                               "channel": "all"
                                               };
+                                              if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
                                                                                                                                               //alert(JSON.stringify(response));
@@ -928,11 +935,24 @@ var MyCampusApp = {
                                               error(function(err) {
                                                     alert("err" + JSON.stringify(response));
                                                     });
-                                              
+                                              }
                                               });
+                
+                
+                MyCampusApp.rootScope.push.on('notification', function(data) {
+                                navigator.notification.alert(data.message,null,data.title,'Ok');
+                        });
+                MyCampusApp.rootScope.onNotification=true;
             }
+
+        MyCampusApp.rootScope.push.on('error', function(e) {
+            alert("error "+e.message);
+        });
+
+        
+
         } catch (e) { 
-            //alert(e)
+            alert(e)
         }
 
     },
