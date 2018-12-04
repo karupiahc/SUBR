@@ -166,6 +166,7 @@ var MyCampusApp = {
                         });
                 },4000);
             }).error(function(data){
+                    alert("data======169" + data);
                 });
         }
         
@@ -517,6 +518,7 @@ var MyCampusApp = {
         $http.post(url + "/metagate/metadata/" + tenant + "?callback=JSON_CALLBACK", {source: data.source, id : data.id, device: window.device}).
             success(function(data) {
                 if(window.device && data.pushconfig) {
+                        alert("=========522"+ data.pushconfig);
                     MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                 }
                 MyCampusApp.refreshMetdata(data, $rootScope, $scope, $sce, tenant, url, logosDirPath, $route, $compile);
@@ -897,7 +899,7 @@ var MyCampusApp = {
 
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
-            //alert("notificationcalled");
+            alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
@@ -918,7 +920,7 @@ var MyCampusApp = {
             
                 
             if(!MyCampusApp.rootScope.onNotification){
-            //alert("onnotification");    
+            alert("onnotification");    
             MyCampusApp.rootScope.push.on('registration', function(data) {
                                               var devicePushID = data.registrationId;
                                               var pushDeviceData = {
@@ -930,7 +932,7 @@ var MyCampusApp = {
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                              //alert(JSON.stringify(response));
+                                                                                                                                              alert(JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
                                                     alert("err" + JSON.stringify(response));
