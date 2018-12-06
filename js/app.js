@@ -171,8 +171,8 @@ var MyCampusApp = {
         
         //Store update bug fix start (Nick)
         else {
-            if(!$rootScope.imageoptimized) {
-                $http.get("default-metadata.json").success(function(data){
+			if(!$rootScope.imageoptimized) {
+				$http.get("default-metadata.json").success(function(data){
                                                            $rootScope.imageoptimized = true;
                                                            //alert(JSON.stringify(data));
                                                            if(window.device && data.pushconfig) {
@@ -200,8 +200,8 @@ var MyCampusApp = {
                                                            }
                                                            }).error(function(data){
                                                                     });
-            }
-        }
+			}
+		}
 
         setTimeout(function() {
             try {
@@ -424,9 +424,9 @@ var MyCampusApp = {
     resumeHandler: function(){
         try {
             $.unblockUI();
-            if(MyCampusApp.rootScope) {
-                MyCampusApp.rootScope.updateCheck();
-            }
+			if(MyCampusApp.rootScope) {
+				MyCampusApp.rootScope.updateCheck();
+			}
         }catch(e) {
             //alert("Exception in Resume handler : " + e);
         }
@@ -487,27 +487,27 @@ var MyCampusApp = {
                         $rootScope.umalert = false;
                     };
                     if(!silent) {
-                        if(window.device) {
-                            if(!$rootScope.umalert) {
-                                $rootScope.umalert = true;
-                                navigator.notification.confirm(
-                                    'App Updates available. Update?', // message
-                                    onConfirm,            // callback to invoke with index of button pressed
-                                    'Update Manager',           // title
-                                    ['Yes','No']         // buttonLabels
-                                );
-                            }
-                        }else {
-                            apprise("App Updates available. Update? ", {'verify':true, 'textYes':"Yes", 'textNo':"No"}, function(r) {
-                                if(r) {
-                                    //navigator.app.exitApp();
-                                    MyCampusApp.updateMetadata(tenant, url, $http, data, $route, $rootScope, $scope, $sce, logosDirPath, $compile);
-                                } else MyCampusApp.modalDialogDisplayed = false;
-                            });
-                        }
-                    }else {
-                        onConfirm(1);
-                    }
+						if(window.device) {
+							if(!$rootScope.umalert) {
+								$rootScope.umalert = true;
+								navigator.notification.confirm(
+									'App Updates available. Update?', // message
+									onConfirm,            // callback to invoke with index of button pressed
+									'Update Manager',           // title
+									['Yes','No']         // buttonLabels
+								);
+							}
+						}else {
+							apprise("App Updates available. Update? ", {'verify':true, 'textYes':"Yes", 'textNo':"No"}, function(r) {
+								if(r) {
+									//navigator.app.exitApp();
+									MyCampusApp.updateMetadata(tenant, url, $http, data, $route, $rootScope, $scope, $sce, logosDirPath, $compile);
+								} else MyCampusApp.modalDialogDisplayed = false;
+							});
+						}
+					}else {
+						onConfirm(1);
+					}
                 }
             });
     },
@@ -784,7 +784,7 @@ var MyCampusApp = {
                 });
                 (function loop(){
                     setTimeout(function() {
-                        //alert ("Inside loop.." + downcounter);
+						//alert ("Inside loop.." + downcounter);
                         if(downcounter == 0) {
                             //$route.reload();
                             //$rootScope.broadcast("");
@@ -795,9 +795,9 @@ var MyCampusApp = {
                             setTimeout(function() {
                                 $.unblockUI();
                             },2000);
-                        }catch(exce) {
-                            //alert ("Exception .." + exce);
-                        }
+						}catch(exce) {
+							//alert ("Exception .." + exce);
+						}
 
                         } else {
                             loop();
@@ -897,8 +897,7 @@ var MyCampusApp = {
 
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
-            alert("notificationcalled 903");
-               console.log("push notificstion start======");
+            //alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
@@ -919,6 +918,7 @@ var MyCampusApp = {
             
                 
             if(!MyCampusApp.rootScope.onNotification){
+            //alert("onnotification");    
             MyCampusApp.rootScope.push.on('registration', function(data) {
                                               var devicePushID = data.registrationId;
                                               var pushDeviceData = {
@@ -928,36 +928,31 @@ var MyCampusApp = {
                                               "channel": "all"
                                               };
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
-                                                      // alert("on===============937"); 
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
-                                                        
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                             
-                                                                                                                                               console.log("success========="+JSON.stringify(response));
+                                                                                                                                              //alert(JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
-                                                      console.log("JSON 943=="+ JSON.stringify(response));
+                                                    alert("err" + JSON.stringify(response));
                                                     });
                                               }
                                               });
                 
                 
                 MyCampusApp.rootScope.push.on('notification', function(data) {
-                         //console.log("notification=========="+ data); 
                                 navigator.notification.alert(data.message,null,data.title,'Ok');
                         });
                 MyCampusApp.rootScope.onNotification=true;
             }
 
         MyCampusApp.rootScope.push.on('error', function(e) {
-               console.log("error =========="+ e.message); 
-                
+            alert("error "+e.message);
         });
 
         
 
         } catch (e) { 
-                 console.log("error =========="+ e); 
+            alert(e)
         }
 
     },
