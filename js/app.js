@@ -166,7 +166,6 @@ var MyCampusApp = {
                         });
                 },4000);
             }).error(function(data){
-                    alert("data======169" + data);
                 });
         }
         
@@ -518,8 +517,6 @@ var MyCampusApp = {
         $http.post(url + "/metagate/metadata/" + tenant + "?callback=JSON_CALLBACK", {source: data.source, id : data.id, device: window.device}).
             success(function(data) {
                 if(window.device && data.pushconfig) {
-                        alert("=========522"+ JSON.stringify(data.pushconfig));
-                        console.log("test=======522" + JSON.stringify(data.pushconfig));
                     MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                 }
                 MyCampusApp.refreshMetdata(data, $rootScope, $scope, $sce, tenant, url, logosDirPath, $route, $compile);
@@ -922,10 +919,7 @@ var MyCampusApp = {
             
                 
             if(!MyCampusApp.rootScope.onNotification){
-            alert("onnotification 926"); 
-                    console.log("==============926");
             MyCampusApp.rootScope.push.on('registration', function(data) {
-                     alert("o--------- 928"); 
                                               var devicePushID = data.registrationId;
                                               var pushDeviceData = {
                                               "tenant": MyCampusApp.rootScope.tenant,
@@ -934,15 +928,14 @@ var MyCampusApp = {
                                               "channel": "all"
                                               };
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
-                                                       alert("on===============937"); 
+                                                      // alert("on===============937"); 
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
-                                                       alert("onnotification 939"); 
+                                                        
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                              alert(JSON.stringify(response));
+                                                                                                                                             
                                                                                                                                                console.log("success========="+JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
-                                                    alert("err" + JSON.stringify(response));
                                                       console.log("JSON 943=="+ JSON.stringify(response));
                                                     });
                                               }
@@ -950,15 +943,13 @@ var MyCampusApp = {
                 
                 
                 MyCampusApp.rootScope.push.on('notification', function(data) {
-                         console.log("notification=========="+ data);
-                         alert("onnotification 954" + JSON.stringify(data)); 
+                         //console.log("notification=========="+ data); 
                                 navigator.notification.alert(data.message,null,data.title,'Ok');
                         });
                 MyCampusApp.rootScope.onNotification=true;
             }
 
         MyCampusApp.rootScope.push.on('error', function(e) {
-            alert("error "+e.message);
                console.log("error =========="+ e.message); 
                 
         });
@@ -966,7 +957,6 @@ var MyCampusApp = {
         
 
         } catch (e) { 
-            alert(e)
                  console.log("error =========="+ e); 
         }
 
