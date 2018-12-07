@@ -897,7 +897,7 @@ var MyCampusApp = {
 
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
-            //alert("notificationcalled");
+            alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
@@ -916,9 +916,9 @@ var MyCampusApp = {
                                                                    });
             
             
-                
+            alert("MyCampusApp.rootScope.push   "+ JSON.stringify(MyCampusApp.rootScope.push));    
             if(!MyCampusApp.rootScope.onNotification){
-            //alert("onnotification");    
+            alert("onnotification");    
             MyCampusApp.rootScope.push.on('registration', function(data) {
                                               var devicePushID = data.registrationId;
                                               var pushDeviceData = {
@@ -930,7 +930,7 @@ var MyCampusApp = {
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                              //alert(JSON.stringify(response));
+                                                                                                                                              alert(JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
                                                     alert("err" + JSON.stringify(response));
@@ -940,6 +940,7 @@ var MyCampusApp = {
                 
                 
                 MyCampusApp.rootScope.push.on('notification', function(data) {
+			alert("push on" + JSON.stringify(data));
                                 navigator.notification.alert(data.message,null,data.title,'Ok');
                         });
                 MyCampusApp.rootScope.onNotification=true;
