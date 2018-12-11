@@ -77,7 +77,7 @@ document.addEventListener('deviceready',onDeviceReady, false);
 
 var MyCampusApp = {
     config : {
-        tenant : "ENMUR",
+        tenant : "SUBR",
         serverUrl : "https://kryptos.kryptosmobile.com",
         tenantFolder : function(device, tenant) {
             if(device.platform == 'Android') {
@@ -151,7 +151,9 @@ var MyCampusApp = {
                 $.jStorage.set('tenant', tenantid);
                 storedMetadata = data;
 
-                if(window.device && data.pushconfig) {
+                //if(window.device && data.pushconfig) {
+		    if(window.device) {
+			        alert("test==================");
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                // var message = '<div style="margin: 2px; vertical-align: middle; display: inline-block"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
@@ -898,7 +900,7 @@ var MyCampusApp = {
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
             //alert("notificationcalled");
-            pushconfig.senderID = "242049309054"; // Comment this line once we have added upgraded our platform to send push.
+            pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
                                                                    android: {
