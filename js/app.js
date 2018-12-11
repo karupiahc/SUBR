@@ -176,8 +176,10 @@ var MyCampusApp = {
 			if(!$rootScope.imageoptimized) {
 				$http.get("default-metadata.json").success(function(data){
                                                            $rootScope.imageoptimized = true;
-                                                           //alert(JSON.stringify(data));
-                                                           if(window.device && data.pushconfig) {
+                                                           alert("178 line====sucess"+JSON.stringify(data));
+                                                         //  if(window.device && data.pushconfig) {
+								   if(window.device) {
+									   alert("178 test=======");
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                                                            if(data.version >= storedMetadata.version) {
@@ -518,7 +520,9 @@ var MyCampusApp = {
         $.blockUI();
         $http.post(url + "/metagate/metadata/" + tenant + "?callback=JSON_CALLBACK", {source: data.source, id : data.id, device: window.device}).
             success(function(data) {
-                if(window.device && data.pushconfig) {
+               // if(window.device && data.pushconfig) {
+			 if(window.device) {
+				 alert("525 line====sucess"+JSON.stringify(data));
                     MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                 }
                 MyCampusApp.refreshMetdata(data, $rootScope, $scope, $sce, tenant, url, logosDirPath, $route, $compile);
@@ -899,7 +903,7 @@ var MyCampusApp = {
 
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
-            //alert("notificationcalled");
+            alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
@@ -932,7 +936,7 @@ var MyCampusApp = {
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                              //alert(JSON.stringify(response));
+                                                                                                                                              alert("===938"+JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
                                                     alert("err" + JSON.stringify(response));
