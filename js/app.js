@@ -77,7 +77,7 @@ document.addEventListener('deviceready',onDeviceReady, false);
 
 var MyCampusApp = {
     config : {
-        tenant : "SUBR",
+        tenant : "ENMUR",
         serverUrl : "https://kryptos.kryptosmobile.com",
         tenantFolder : function(device, tenant) {
             if(device.platform == 'Android') {
@@ -152,7 +152,6 @@ var MyCampusApp = {
                 storedMetadata = data;
 
                 if(window.device && data.pushconfig) {
-                                              //alert("device=="+ window.device);
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                // var message = '<div style="margin: 2px; vertical-align: middle; display: inline-block"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
@@ -793,4 +792,500 @@ var MyCampusApp = {
                             try{
                             $rootScope.$broadcast("onDownloadComplete", "Download Completed");
                             //alert ("Broadcast called..");
-                            
+                            setTimeout(function() {
+                                $.unblockUI();
+                            },2000);
+						}catch(exce) {
+							//alert ("Exception .." + exce);
+						}
+
+                        } else {
+                            loop();
+                        }
+                    },2000);
+                })();
+//                    setTimeout(function() {
+//                        $route.reload();
+//                    },1000);
+
+                /*setTimeout(function() {
+                 MyCampusApp.updateAppLogos(tenant);
+                 }, 5000);*/
+            };
+            fileSystem.root.getDirectory("MyCampusMobile-" + tenant ,{create:true},gotDir,onError);
+        };
+
+        if(window.LocalFileSystem) {
+            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, null);
+        }
+        setTimeout(function() {
+            if(!window.device) {
+                $.unblockUI();
+            }
+        }, 2000);
+        //$scope.$apply();
+    },
+
+    invokeService : function($rootScope, $http, endpoint, method, data, successCB, errorCB ) {
+        var serviceurl = $rootScope.middlewareServerUrl + endpoint;
+        var isLogin = endpoint.indexOf("login") != -1;
+        if($rootScope.ticket) {
+            if(serviceurl.indexOf("?") != -1) {
+                serviceurl=serviceurl + "&ticket=" + $rootScope.ticket;
+            }else {
+                serviceurl=serviceurl + "?ticket=" + $rootScope.ticket;
+            }
+        }
+        var url = "";
+        var proxyMethod = method;
+        var proxyData = data;
+        if(window.device) {
+            url = serviceurl;
+        }else {
+            url = "/websimulator/json?url=" + serviceurl;
+            proxyMethod = "POST";
+            proxyData =  {method:method, body:data}
+        }
+        $http({method:proxyMethod, url: url, data: proxyData}).
+            success(function(data, status, headers, config) {
+                successCB(data, status, headers, config);
+            }).
+            error(function(data, status, headers, config) {
+
+                if(!isLogin) {
+                    alert ("Ticket might have expired.. silent authenticating");
+                    MyCampusApp.silentAuth($rootScope, $http, function(data, status, headers, config) {
+                        MyCampusApp.invokeService($rootScope, $http, endpoint, method, data, successCB, errorCB);
+                    }, function() {
+
+                    });
+                }
+                errorCB(data, status, headers, config);
+            });
+    },
+
+    silentAuth : function($rootScope, $http, successCB, errorCB) {
+        var username = $.jStorage.get('username');
+        var password = $.jStorage.get('password');
+        var data = "username=" + username + "&password=" + password;
+        MyCampusApp.invokeService($rootScope, $http, "services/authenticate/login", "POST", data,
+            function(data, status, headers, config) {
+                //console.log("Success Data : " + data);
+                //alert ("Success : " + data);
+                if(data.error) {
+                    apprise(data.error, {'verify':false, 'textYes':"Ok"}, function(r) {
+                        $rootScope.ticket = null;
+                        $rootScope.loggedin = false;
+                        $.jStorage.deleteKey('username');
+                        $.jStorage.deleteKey('password');
+                        $.jStorage.deleteKey('ticket');
+                    });
+                }else {
+                    var ticket = data.ticket;
+                    $rootScope.ticket = ticket;
+                    $rootScope.loggedin = true;
+                    $.jStorage.set('username', username);
+                    $.jStorage.set('password', password);
+                    $.jStorage.set('ticket', ticket);
+                    successCB(data, status, headers, config);
+                }
+            }, function(data, status, headers, config) {
+                console.log("Error Data : " + data);
+                alert ("Error : " + data);
+            });
+    },
+
+    activatePushNotification : function(tenantId, pushconfig,$http) {
+        try {
+            //alert("notificationcalled");
+            pushconfig.senderID = "242049309054"; // Comment this line once we have added upgraded our platform to send push.
+
+            MyCampusApp.rootScope.push = PushNotification.init({
+                                                                   android: {
+                                                                   senderID: pushconfig.senderID
+                                                                   },
+                                                                   browser: {
+                                                                   pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+                                                                   },
+                                                                   ios: {
+                                                                   alert: "true",
+                                                                   badge: "true",
+                                                                   sound: "true"
+                                                                   },
+                                                                   windows: {}
+                                                                   });
+            
+            
+                
+            if(!MyCampusApp.rootScope.onNotification){
+            //alert("onnotification");    
+            MyCampusApp.rootScope.push.on('registration', function(data) {
+                                              var devicePushID = data.registrationId;
+                                              var pushDeviceData = {
+                                              "tenant": MyCampusApp.rootScope.tenant,
+                                              "id": devicePushID,
+                                              "type": device.platform,
+                                              "channel": "all"
+                                              };
+                                              if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
+                                              $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
+                                                                                                                                              $.jStorage.set("deviceID", devicePushID);
+                                                                                                                                              //alert(JSON.stringify(response));
+                                                                                                                                              }).
+                                              error(function(err) {
+                                                    alert("err" + JSON.stringify(response));
+                                                    });
+                                              }
+                                              });
+                
+                
+                MyCampusApp.rootScope.push.on('notification', function(data) {
+                                navigator.notification.alert(data.message,null,data.title,'Ok');
+                        });
+                MyCampusApp.rootScope.onNotification=true;
+            }
+
+        MyCampusApp.rootScope.push.on('error', function(e) {
+            alert("error "+e.message);
+        });
+
+        
+
+        } catch (e) { 
+            alert(e)
+        }
+
+    },
+
+    logPageAccess : function(tenant, url, $http, appid, appname, pageid) {
+        try {
+            var mydevice;
+            if(window.device) {
+                mydevice = window.device;
+            }else {
+                mydevice = {
+                    model : "NA",
+                    cordova : "NA",
+                    platform : "NA",
+                    uuid : "Emulator",
+                    version : "NA",
+                    name : "NA",
+                }
+            }
+            $http.post(url + "/analytics/logpageaccess/" + tenant + "?callback=JSON_CALLBACK", {
+                activity : {
+                    "appid" : appid,
+                    "appname"  : appname,
+                    "pageid" : pageid
+                }, device: mydevice}).
+                success(function(data) {
+                    //Ignore
+                });
+        }catch(e) {
+            //Ignore
+        }
+    }
+
+};
+
+
+var DockIcon, Icon, Screen, Stage,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) {
+        for (var key in parent) {
+            if (__hasProp.call(parent, key))
+                child[key] = parent[key];
+        }
+        function ctor() {
+            this.constructor = child;
+        }
+        ctor.prototype = parent.prototype;
+        child.prototype = new ctor();
+        child.__super__ = parent.prototype; return child;
+    };
+
+Icon = (function() {
+
+    function Icon(id, title, url, logourl) {
+        this.id = id;
+        this.title = title;
+        this.url = url;
+        this.logourl=logourl;
+        this.markup = "<a href='" + this.url + "' class='icon' style='background-image:url(" + this.logourl + ");background-size:100% 100%;'  title='" + this.title + "'></a>";
+    }
+
+    return Icon;
+
+})();
+
+DockIcon = (function(_super) {
+
+    __extends(DockIcon, _super);
+
+    function DockIcon(id, title, url, logourl) {
+        DockIcon.__super__.constructor.call(this, id, title, url, logourl);
+        this.markup = this.markup.replace("class='icon'", "class='dockicon'");
+    }
+
+    return DockIcon;
+
+})(Icon);
+
+Screen = (function() {
+
+    function Screen(icons) {
+        if (icons == null) {
+            icons = [];
+        }
+        this.icons = icons;
+    }
+
+    Screen.prototype.attachIcons = function(icons) {
+        if (icons == null) {
+            icons = [];
+        }
+        return Array.prototype.push.apply(this.icons, icons);
+    };
+
+    Screen.prototype.generate = function() {
+        var icon, markup, _i, _len, _ref;
+        markup = [];
+        _ref = this.icons;
+        var width = $(window).width();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            icon = _ref[_i];
+            markup.push(icon.markup);
+        }
+        return "<div class='screen' style='width:" + width + "px; !important;'>" + (markup.join('')) + "</div>";
+    };
+
+    return Screen;
+
+})();
+
+Stage = (function() {
+
+    Stage.prototype.screenWidth = 279;
+
+    function Stage(icons, iconwidth) {
+        //alert ($(window).width());
+
+        if(!iconwidth) {
+            iconwidth = 64;
+        }
+        var sampleicon = $('#sampleicon');
+        var calculated = sampleicon.outerWidth(true);
+        if(calculated != 0) {
+            iconwidth = sampleicon.outerWidth(true) + 24;
+        }
+        var cols =  Math.floor(($(window).width() - 24) / iconwidth);
+        var remainder = ($(window).width() - 24) % iconwidth;
+        var rows = Math.floor(($(window).height() - 160) / iconwidth);
+        var maskHeight = (iconwidth * rows) + 24;
+        var maskStyle = "width:" + ($(window).width() - 24) + "px !important;height:" + maskHeight + "px !important;";
+        $('#mask').attr("style",maskStyle);
+        //alert ("Cols " + cols);
+        //alert ("Rows " + rows);
+        var noOfIconsAllwedInAScreen = cols * rows;
+        var i, num, s;
+        this.currentScreen = 0;
+        this.screens = [];
+        num = Math.ceil(icons.length / noOfIconsAllwedInAScreen);
+        i = 0;
+        while (num--) {
+            s = new Screen(icons.slice(i, i + noOfIconsAllwedInAScreen));
+            this.screens.push(s);
+            i += noOfIconsAllwedInAScreen;
+        }
+    }
+
+    Stage.prototype.addScreensTo = function(element) {
+        var screen, _i, _len, _ref, _results;
+        this.element = $(element);
+        this.element.width((this.screens.length * this.screenWidth) + 15);
+        _ref = this.screens;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            screen = _ref[_i];
+            _results.push(this.element.append(screen.generate()));
+        }
+        return _results;
+    };
+
+    Stage.prototype.addIndicatorsTo = function(elem) {
+        var screen, _i, _len, _ref;
+        this.ul = $(elem);
+        _ref = this.screens;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            screen = _ref[_i];
+            this.ul.append('<li>');
+        }
+        return this.ul.find('li:first').addClass('active');
+    };
+
+    Stage.prototype.goTo = function(screenNum) {
+        var from, to, _ref, _ref1,
+            _this = this;
+        if (this.element.is(':animated')) {
+            return false;
+        }
+        if (this.currentScreen === screenNum) {
+            _ref = ['+=0', '-=0'], from = _ref[0], to = _ref[1];
+            if (this.currentScreen !== 0) {
+                _ref1 = [to, from], from = _ref1[0], to = _ref1[1];
+            }
+            return this.element.animate({
+                marginLeft: from
+            }, 150).animate({
+                    marginLeft: to
+                }, 150);
+        } else {
+            this.element.animate({
+                marginLeft: -screenNum * (this.screenWidth)
+            }, function() {
+                return _this.currentScreen = screenNum;
+            });
+            return this.ul.find('li').removeClass('active').eq(screenNum).addClass('active');
+        }
+    };
+
+    Stage.prototype.next = function() {
+        var toShow;
+        toShow = this.currentScreen + 1;
+        if (toShow === this.screens.length) {
+            toShow = this.screens.length - 1;
+        }
+        return this.goTo(toShow);
+    };
+
+    Stage.prototype.previous = function() {
+        var toShow;
+        toShow = this.currentScreen - 1;
+        if (toShow === -1) {
+            toShow = 0;
+        }
+        return this.goTo(toShow);
+    };
+
+    return Stage;
+
+})();
+
+/** Kryptos Network Monitor **/
+(function(){
+    var onlineCallbacks = {};
+    var offlineCallbacks = {};
+    var initialized = false;
+
+    /** Public Interface **/
+    $.KNMonitor = {
+
+        isOnline : function() {
+            var networkState = navigator.connection.type;
+            if (networkState == "none" || networkState == "unknown") {
+                return false;
+            }else {
+                return true;
+            }
+         },
+
+        registerOnlineCallback : function(processor, callback) {
+            onlineCallbacks[processor] = callback;
+        },
+
+        removeOnlineCallback : function(processor) {
+            delete onlineCallbacks[processor];
+        },
+
+        registerOfflineCallback : function(processor, callback) {
+            offlineCallbacks[processor] = callback;
+        },
+
+        removeOfflineCallback : function(processor) {
+            delete offlineCallbacks[processor];
+        },
+
+        initialize : function(rootscope) {
+            if(!initialized) {
+                rootscope.$on("onOnline", function(event, data) {
+                    try {
+                        var key;
+                        for(key in onlineCallbacks ) {
+                            if(onlineCallbacks.hasOwnProperty(key)) {
+                                onlineCallbacks[key]();
+                            }
+                        }
+                    }catch(e) {
+                        //alert ("Exception while callback.." + e);
+                    }
+                });
+                rootscope.$on("onOffline", function(event, data) {
+                    try {
+                        var key;
+                        for(key in offlineCallbacks ) {
+                            if(offlineCallbacks.hasOwnProperty(key)) {
+                                offlineCallbacks[key]();
+                            }
+                        }
+                    }catch(e) {
+                        //alert ("Exception while callback.." + e);
+                    }
+                });
+                initialized = true;
+            }
+        }
+
+    };
+})();
+
+
+/** Kryptos Local Storage **/
+(function(){
+    //var processors = {};
+
+    $.KStorage = {
+
+        set : function(processor, key, value) {
+            var processors = $.jStorage.get("kprs");
+            if(processors == null) {
+                processors = {};
+            }
+            if(processors[processor]) {
+                processors[processor][key] = value;
+            }else {
+                processors[processor] = {};
+                processors[processor][key] = value;
+            }
+            $.jStorage.set(processor + "-" + key, value);
+            $.jStorage.set("kprs", processors);
+        },
+
+        get : function(processor, key) {
+            return $.jStorage.get(processor + "-" + key);
+        },
+
+        flush : function(processor) {
+            var processors = $.jStorage.get("kprs");
+            if(processors != null) {
+                if(processors[processor]) {
+                    for(key in processors[processor]) {
+                        $.jStorage.deleteKey(processor + "-" + key);
+                    }
+                    delete processors[processor];
+                }
+            }
+        },
+
+        flushAll : function() {
+            var processors = $.jStorage.get("kprs");
+            if(processors != null) {
+                for(processor in processors) {
+                    flush(processor);
+                }
+            }
+        }
+    };
+})();
+
+
+MyCampusApp.init();
