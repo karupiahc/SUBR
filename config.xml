@@ -7,8 +7,7 @@
         <author href="http://kryptosmobile.com" email="info@kryptosmobile.com">Kryptos Mobile Team</author>
         <feature name="http://api.phonegap.com/1.0/device" />
         <!--<preference name="phonegap-version" value="cli-5.2.0" />-->
-        <!--<preference name="phonegap-version" value="cli-8.0.0" />-->
-        
+	    
         <preference name="permissions"                value="none"/>
         <preference name="orientation"                value="portrait" />        <!-- all: default means both landscape and portrait are enabled -->
         <preference name="target-device"              value="universal" />      <!-- all: possible values handset, tablet, or universal -->
@@ -116,16 +115,10 @@
         
         <!--<preference name="android-build-tool" value="gradle" />-->
 
-        <gap:plugin name="phonegap-plugin-push" source="npm" spec="1.8.2"> 
+        <gap:plugin name="phonegap-plugin-push" source="npm" spec="2.2.3"> 
             <param name="SENDER_ID" value="459115189650" />
         </gap:plugin>
-       <!--
-        <platform name="ios">
-	<plugin name="phonegap-plugin-push" spec="2.2.3" />
-      <param name="SENDER_ID" value="459115189650" />
-	<!--<resource-file src="GoogleService-Info.plist" />-->
-    </platform>
-        -->
+       
         <!-- ios sms plugin -->
         <!--<plugin spec="https://github.com/DevendraSinghNagar/cordova-sms-all-devices-plugin.git" source="git" />-->
 
