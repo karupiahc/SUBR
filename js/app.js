@@ -151,9 +151,8 @@ var MyCampusApp = {
                 $.jStorage.set('tenant', tenantid);
                 storedMetadata = data;
 
-                //if(window.device && data.pushconfig) {
-		    if(window.device) {
-                                              alert("device=="+ window.device);
+                if(window.device && data.pushconfig) {
+                                              //alert("device=="+ window.device);
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                // var message = '<div style="margin: 2px; vertical-align: middle; display: inline-block"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
