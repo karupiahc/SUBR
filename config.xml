@@ -123,7 +123,7 @@
         <platform name="ios">
 	<plugin name="phonegap-plugin-push" spec="2.2.3" />
       <param name="SENDER_ID" value="459115189650" />
-	<resource-file src="GoogleService-Info.plist" />
+	<!--<resource-file src="GoogleService-Info.plist" />-->
     </platform>
         
         <!-- ios sms plugin -->
