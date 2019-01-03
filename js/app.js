@@ -144,14 +144,14 @@ var MyCampusApp = {
         if(!storedMetadata) {
             $http.get("default-metadata.json").success(function(data){
                 var tenantid = data.tenantid
+                //alert(JSON.stringify(data));
                 $.jStorage.set(tenantid + '-metadata', data);
                 MyCampusApp.config.tenant = tenantid;
                 $rootScope.tenant = tenantid;
                 $.jStorage.set('tenant', tenantid);
                 storedMetadata = data;
 
-                //if(window.device && data.pushconfig) {
-		    if(window.device) {
+                if(window.device && data.pushconfig) {
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                // var message = '<div style="margin: 2px; vertical-align: middle; display: inline-block"><i class="icon-cog icon-spin icon-4x"></i><h3 style="color:white;">Initializing..</h3></div>';
@@ -174,8 +174,8 @@ var MyCampusApp = {
 			if(!$rootScope.imageoptimized) {
 				$http.get("default-metadata.json").success(function(data){
                                                            $rootScope.imageoptimized = true;
-                                                         //  if(window.device && data.pushconfig) {
-								   if(window.device) {
+                                                           //alert(JSON.stringify(data));
+                                                           if(window.device && data.pushconfig) {
                                                                 MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                                                             }
                                                            if(data.version >= storedMetadata.version) {
@@ -516,8 +516,7 @@ var MyCampusApp = {
         $.blockUI();
         $http.post(url + "/metagate/metadata/" + tenant + "?callback=JSON_CALLBACK", {source: data.source, id : data.id, device: window.device}).
             success(function(data) {
-               // if(window.device && data.pushconfig) {
-			 if(window.device) {
+                if(window.device && data.pushconfig) {
                     MyCampusApp.activatePushNotification(tenant, data.pushconfig,$http);
                 }
                 MyCampusApp.refreshMetdata(data, $rootScope, $scope, $sce, tenant, url, logosDirPath, $route, $compile);
@@ -898,6 +897,7 @@ var MyCampusApp = {
 
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
+            //alert("notificationcalled");
             pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
@@ -930,7 +930,7 @@ var MyCampusApp = {
                                               if ($.jStorage.get("deviceID") == null || $.jStorage.get("deviceID") == undefined) {
                                               $http.post("https://push.kryptosmobile.com/kryptosds/push/adddeviceToChannel", pushDeviceData).success(function(response) {
                                                                                                                                               $.jStorage.set("deviceID", devicePushID);
-                                                                                                                                              //alert("===938"+JSON.stringify(response));
+                                                                                                                                              //alert(JSON.stringify(response));
                                                                                                                                               }).
                                               error(function(err) {
                                                     alert("err" + JSON.stringify(response));
