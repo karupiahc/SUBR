@@ -77,7 +77,7 @@ document.addEventListener('deviceready',onDeviceReady, false);
 
 var MyCampusApp = {
     config : {
-        tenant : "SUBR",
+        tenant : "ENMUR",
         serverUrl : "https://kryptos.kryptosmobile.com",
         tenantFolder : function(device, tenant) {
             if(device.platform == 'Android') {
@@ -898,7 +898,7 @@ var MyCampusApp = {
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
             //alert("notificationcalled");
-            pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
+            pushconfig.senderID = "242049309054"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
                                                                    android: {
