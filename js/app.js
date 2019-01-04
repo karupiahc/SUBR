@@ -622,6 +622,7 @@ var MyCampusApp = {
         var width = $(window).width() > 780 ? $(window).width() - 280 : $(window).width();
         var cols =  Math.floor(width / iconwidth);
         var rows = Math.floor(($(window).height() - 200) / iconwidth);
+
         for (_i = 0, _len = allIcons.length; _i < _len; _i++) {
             icon = allIcons[_i];
             var markup = '<li><a href="' + icon.url + '"><img src="' + icon.logourl + '" class="icon"></img></a>' +
@@ -629,6 +630,7 @@ var MyCampusApp = {
                 + icon.title + '</div></li>';
             homedata.append(markup);
         }
+
         //AK added for promptumenu
         $("#homedata").promptumenu({
             width:(width - 24),
@@ -896,7 +898,7 @@ var MyCampusApp = {
     activatePushNotification : function(tenantId, pushconfig,$http) {
         try {
             //alert("notificationcalled");
-            pushconfig.senderID = "459115189650"; // Comment this line once we have added upgraded our platform to send push.
+            pushconfig.senderID = "242049309054"; // Comment this line once we have added upgraded our platform to send push.
 
             MyCampusApp.rootScope.push = PushNotification.init({
                                                                    android: {
