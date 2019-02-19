@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
     <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.kryptosmobile.SUBR" version   = "1.0.5">
+        id = "com.kryptosmobile.SUBR" version   = "2.0.1">
         <name>MySUBR</name>
         <description>Southern University and A&amp;M College | Baton Rouge</description>
         <author href="http://kryptosmobile.com" email="info@kryptosmobile.com">Kryptos Mobile Team</author>
@@ -93,9 +93,9 @@
         <access origin="*"/>
         <allow-navigation href="*" />
         <allow-intent href="*" />
-        <plugin name="cordova-plugin-contacts" source="npm" spec="2.0.0">
+        <!--<plugin name="cordova-plugin-contacts" source="npm" spec="2.0.0">
             <variable name="CONTACTS_USAGE_DESCRIPTION" value="To add contact" />
-        </plugin>
+        </plugin>-->
         <gap:plugin name="cordova-plugin-camera" source="npm" spec="2.4.1" />
         <gap:plugin name="cordova-plugin-device" source="npm" />
         <gap:plugin name="cordova-plugin-dialogs" source="npm" />
@@ -131,7 +131,7 @@
         <gap:plugin name="cordova-plugin-actionsheet" source="npm" />
         <!--<gap:plugin name="cordova-plugin-x-socialsharing" source="npm" />-->
        <gap:plugin name="cordova-plugin-x-socialsharing" source="npm" spec="5.4.1"/>
-          <gap:plugin name="cordova-plugin-phonedialer" source="npm" />
+          <!--<gap:plugin name="cordova-plugin-phonedialer" source="npm" />-->
         
          <plugin spec="https://github.com/ti8m/DocumentHandler.git" source="git" />
         
@@ -148,9 +148,9 @@
         </array>
     </gap:config-file>
     
-        <gap:config-file platform="ios" parent="NSPhotoLibraryUsageDescription" overwrite="true">
+        <!--<gap:config-file platform="ios" parent="NSPhotoLibraryUsageDescription" overwrite="true">
             <string>To access photos from gallery</string>
-        </gap:config-file>
+        </gap:config-file>-->
 
         <gap:config-file platform="ios" parent="UIStatusBarHidden" overwrite="true">
             <true/>
