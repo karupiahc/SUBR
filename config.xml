@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
     <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
-        id = "com.kryptosmobile.SUBR" version   = "2.0.1">
+        id = "com.kryptosmobile.SUBR" version   = "3.0.1">
         <name>MySUBR</name>
         <description>Southern University and A&amp;M College | Baton Rouge</description>
         <author href="http://kryptosmobile.com" email="info@kryptosmobile.com">Kryptos Mobile Team</author>
